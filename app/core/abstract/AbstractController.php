@@ -12,7 +12,8 @@ abstract class AbstractController
 
   public function __construct()
   {
-    $this->session = App::get('App\\Core\\Session');
+    $this->session = App::getDependency('session');
+//    ('App\\Core\\Session');
   }
 
   protected function renderJSON(array $data, int $code = 200): void

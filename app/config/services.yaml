@@ -1,0 +1,18 @@
+core:
+  database: App\Core\Database::getInstance
+  session: App\Core\Session::getInstance
+  router: App\Core\Router
+
+repositories:
+  utilisateurRepository: App\Repository\UtilisateurRepository::getInstance
+  compteRepository: App\Repository\CompteRepository::getInstance
+
+services:
+  securityService: App\Service\SecurityService::getInstance
+  compteService: App\Service\CompteService::getInstance
+
+middlewares:
+  cryptPassword: App\Config\middlewares\CryptPassword
+
+validators:
+  validator: App\Config\Validator

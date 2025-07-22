@@ -3,11 +3,14 @@
 namespace App\Core\Abstract;
 
 use App\Core\App;
+use App\Core\Singleton;
 
-abstract class AbstractRepository
+abstract class AbstractRepository extends Singleton
 {
   protected string $table;
   protected \PDO $db;
+
+
 
   abstract public  function selectAll();
   abstract public  function insert();
@@ -33,6 +36,7 @@ abstract class AbstractRepository
 
   public function __construct()
   {
-    $this->db = App::get('App\\Core\\Database')->getConnection();
+    parent::__construct();
+    $this->db = App::getDependency('database')->getConnection();
   }
 }

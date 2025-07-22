@@ -16,7 +16,7 @@ class CitoyenRepository extends AbstractRepository
   public function __construct()
   {
     parent::__construct();
-    $this->db = Database::getInstance()->getConnection();
+//    $this->db = Database::getInstance()->getConnection();
   }
   public function selectAll(): array
   {

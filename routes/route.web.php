@@ -14,7 +14,11 @@ $routes = [
   '/citoyen/{cni}' => [
     'controller' => CitoyenController::class,
     'method' => 'findByCni'
-  ]
+  ],
+  // '/citoyens' => [
+  //   'controller' => CitoyenController::class,
+  //   'method' => 'index'
+  // ],
 ];
 
 return $routes;

@@ -52,7 +52,7 @@ class Seeder
       // ['Diallo', 'Abdoul', '4111161818112', 'Matam', '1991-09-09', 'abdoul_cni.png'],
       // ['AW', 'Aboubacrine', '129019990275', 'Podor', '1994-12-21', 'aboubacrine_cni.png'],
       // ['Diallo', 'Jeeri', '7777', 'Kolda', '1996-06-06', 'jeeri_cni.png'],
-      ['douvewane', 'Coach WANE', '2020999959249', 'Louga', '1985-08-08', 'cni_1.jpg']
+      ['koulibali', 'Kalidou', '2020999959240', 'Thies', '2000-08-08', 'cni_2.jpg']
     ];
 
     $stmt = $this->pdo->prepare("
