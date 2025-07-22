@@ -3,3 +3,4 @@ test/
 vendor/
 composer.lock
 .idea/
+migrations/kalidou.tar.xz
