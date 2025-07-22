@@ -18,7 +18,7 @@
 //  public function findByCni(string $cni): void
 //  {
 //    $citoyen = $this->citoyenService->getCitoyenByCni($cni);
-//
+
 //    if ($citoyen) {
 //      $this->renderJSON([
 //        'data' => $citoyen->toArray(),
@@ -96,10 +96,25 @@ class CitoyenController extends AbstractController
     }
   }
 
-
-  public function index(): void
+  public function findByCni(string $cni): void
   {
-    $data = $this->citoyenService->getAllCitoyens();
-    var_dump($data);
+
+    $citoyen = $this->citoyenService->getCitoyenByCni($cni);
+
+    if ($citoyen) {
+      $this->renderJSON([
+        'data' => $citoyen->toArray(),
+        'statut' => 'success',
+        'code' => 200,
+        'message' => "Le numéro de carte d'identité a été retrouvé"
+      ], 200);
+    } else {
+      $this->renderJSON([
+        'data' => null,
+        'statut' => 'error',
+        'code' => 404,
+        'message' => "Le numéro de carte d'identité non retrouvé"
+      ], 404);
+    }
   }
 }

@@ -72,61 +72,91 @@
 namespace App\Core;
 
 use App\Core\App;
+use function App\Config\dump_die;
 
 class Router
 {
-    static public function getURI(): ?string
-    {
-        $uri = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
-        return $uri ?: null;
+  static public function getURI(): ?string
+  {
+    $uri = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
+    return $uri ?: null;
+  }
+
+  static public function findURIToArray(array $routes): bool|array
+  {
+    $uri = static::getURI();
+    $uriParts = explode('/', trim($uri, '/'));
+
+    // Recherche d'une correspondance exacte
+    if (isset($routes[$uri])) {
+      return $routes[$uri];
     }
 
-    static public function findURIToArray(array $routes): bool|array
-    {
-        $uri = static::getURI();
-        return $routes[$uri] ?? false;
-    }
+    // Recherche de routes dynamiques sans regex
+    foreach ($routes as $routePattern => $routeData) {
+      $patternParts = explode('/', trim($routePattern, '/'));
+      if (count($patternParts) !== count($uriParts)) {
+        continue;
+      }
 
-    public static function resolve(array $routes): void
-    {
-        $route = static::findURIToArray($routes);
-        if ($route) {
-            error_log("Route trouvée : " . print_r($route, true));
-
-            // Instanciation et exécution des middlewares avec injection automatique
-            if (!empty($route['middleware'])) {
-                foreach ($route['middleware'] as $middlewareClass) {
-                    // Instanciation via le container pour injection des dépendances
-                    $middleware = App::resolve($middlewareClass);
-                    if (method_exists($middleware, 'handle')) {
-                        $middleware->handle();
-                    } else {
-                        throw new \Exception("Le middleware $middlewareClass doit implémenter la méthode handle.");
-                    }
-                }
-            }
-
-            $class = $route['controller'] ?? null;
-            $action = $route['method'] ?? null;
-
-            if (!$class || !$action) {
-                throw new \Exception("Route mal configurée : contrôleur ou méthode manquant.");
-            }
-
-            // Instanciation du contrôleur avec injection automatique
-            $controller = App::resolve($class);
-
-            if (!method_exists($controller, $action)) {
-                throw new \Exception("La méthode $action n'existe pas dans le contrôleur $class.");
-            }
-
-            // Appel de la méthode d'action (tu peux ajouter la gestion des paramètres si besoin)
-            $controller->$action();
-        } else {
-            error_log("Route non trouvée pour : " . static::getURI());
-            http_response_code(404);
-            echo 'Route non trouvée';
-            exit;
+      $params = [];
+      $matched = true;
+      foreach ($patternParts as $i => $part) {
+        if (preg_match('/^{[^}]+}$/', $part)) {
+          // C'est un paramètre
+          $paramName = trim($part, '{}');
+          $params[$paramName] = $uriParts[$i];
+        } elseif ($part !== $uriParts[$i]) {
+          $matched = false;
+          break;
         }
+      }
+      if ($matched) {
+        if (!empty($params)) {
+          $routeData['params'] = $params;
+        }
+        return $routeData;
+      }
     }
+    return false;
+  }
+
+  public static function resolve(array $routes): void
+  {
+    $route = static::findURIToArray($routes);
+    if ($route) {
+      error_log("Route trouvée : " . print_r($route, true));
+      // Instanciation et exécution des middlewares avec injection automatique
+      if (!empty($route['middleware'])) {
+        foreach ($route['middleware'] as $middlewareClass) {
+          $middleware = App::resolve($middlewareClass);
+          if (method_exists($middleware, 'handle')) {
+            $middleware->handle();
+          } else {
+            throw new \Exception("Le middleware $middlewareClass doit implémenter la méthode handle.");
+          }
+        }
+      }
+      $class = $route['controller'] ?? null;
+      $action = $route['method'] ?? null;
+      if (!$class || !$action) {
+        throw new \Exception("Route mal configurée : contrôleur ou méthode manquant.");
+      }
+      $controller = App::resolve($class);
+      if (!method_exists($controller, $action)) {
+        throw new \Exception("La méthode $action n'existe pas dans le contrôleur $class.");
+      }
+      // Appel de la méthode d'action avec paramètres dynamiques si présents
+      if (isset($route['params']) && is_array($route['params']) && count($route['params']) > 0) {
+        call_user_func_array([$controller, $action], array_values($route['params']));
+      } else {
+        $controller->$action();
+      }
+    } else {
+      error_log("Route non trouvée pour : " . static::getURI());
+      http_response_code(404);
+      echo 'Route non trouvée';
+      exit;
+    }
+  }
 }

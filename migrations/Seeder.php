@@ -50,9 +50,9 @@ class Seeder
       // ['Diallo', 'Moussa', '2020123456789', 'Thiès', '1995-07-15', 'moussa_cni.png'],
       // ['Traoré', 'Fatoumata', '2020987654321', 'Ziguinchor', '1993-03-30', 'fatou_cni.png'],
       // ['Diallo', 'Abdoul', '4111161818112', 'Matam', '1991-09-09', 'abdoul_cni.png'],
-      // ['AW', 'Aboubacrine', '129019990275', 'Podor', '1994-12-21', 'aboubacrine_cni.png'],
-      // ['Diallo', 'Jeeri', '7777', 'Kolda', '1996-06-06', 'jeeri_cni.png'],
-      ['koulibali', 'Kalidou', '2020999959240', 'Thies', '2000-08-08', 'cni_2.jpg']
+      ['AW', 'Aboubacrine', '129019990275', 'Podor', '1994-12-21', 'aboubacrine_cni.png'],
+      // ['Diallo', 'Jeeri', '7777', 'Kolda', '1996-06-06', 'cni_2.jpg'],
+//      ['koulibali', 'Kalidou', '2020999959240', 'Thies', '2000-08-08', 'cni_2.jpg']
     ];
 
     $stmt = $this->pdo->prepare("

@@ -3,10 +3,6 @@
 use App\Controller\CitoyenController;
 
 $routes = [
-  '/citoyen/id' => [
-    'controller' => CitoyenController::class,
-    'method' => 'findByCni'
-  ],
   '/citoyens' => [
     'controller' => CitoyenController::class,
     'method' => 'getAllCitoyens'
