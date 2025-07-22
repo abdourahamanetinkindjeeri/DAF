@@ -1,0 +1,41 @@
+services:
+  db:
+    image: postgres:15
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "jeeridev@gmail.com"
+      PGADMIN_DEFAULT_PASSWORD: "appdaf"
+      POSTGRES_DB: appdaf
+      POSTGRES_USER: appdaf
+      POSTGRES_PASSWORD: appdaf
+    ports:
+      - "55432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    volumes:
+      - ./:/var/www/html
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: appdaf
+      DB_USER: appdaf
+      DB_PASSWORD: appdaf
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "9080:80"
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+
+volumes:
+  db_data:

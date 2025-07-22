@@ -1,0 +1,39 @@
+{
+  "name": "jeeri/appdaf",
+  "description": "Réalisation d’une application web dénommée AppDAF dans le cadre de notre apprentissage de la programmation orientée objet (POO) au sein de l’ODC (Orange Digital Center). L’application simule les fonctionnalités de la DAF.",
+  "autoload": {
+    "psr-4": {
+      "App\\Entity\\": "src/entity/",
+      "App\\Repository\\": "src/repository/",
+      "App\\Service\\": "src/service/",
+      "App\\Enum\\": "src/enum/",
+      "App\\Translate\\": "src/enum/transalate/fr/",
+      "App\\Controller\\": "src/controller/",
+      "App\\Core\\": "app/core/",
+      "App\\Config\\": "app/config/",
+      "App\\Core\\Abstract\\": "app/core/abstract",
+      "App\\Core\\Middlewares\\": "app/core/middlewares",
+      "App\\Validator\\": "app/core/validator",
+      "App\\Migration\\": "migrations/"
+    },
+    "files": [
+      "app/config/helpers.php"
+    ]
+  },
+  "scripts": {
+    "database:migrate": "php migrations/migration.php",
+    "database:seed": "php migrations/Seeder.php"
+  },
+  "authors": [
+    {
+      "name": "abdourahamanetinkindjeeri99",
+      "email": "abdourahamanetinkindjeeri99@gmail.com"
+    }
+  ],
+  "require": {
+    "vlucas/phpdotenv": "^5.6",
+    "ext-pdo": "*",
+    "symfony/yaml": "^7.3",
+    "cloudinary/cloudinary_php": "^3.1"
+  }
+}
