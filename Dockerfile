@@ -12,6 +12,9 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 # Copie le code de l'application
 COPY . /var/www/html
 
+COPY .env /var/www/html/.env
+
+
 # Installe les dépendances PHP
 WORKDIR /var/www/html
 RUN composer install --no-interaction --prefer-dist
