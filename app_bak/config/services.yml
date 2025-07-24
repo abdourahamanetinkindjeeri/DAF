@@ -1,0 +1,10 @@
+services:
+  App\Core\Router:
+    class: App\Core\Router
+  App\Service\CitoyenService:
+    class: App\Service\CitoyenService
+    arguments: ['@App\Repository\CitoyenRepository']
+  App\Core\Session:
+    class: App\Core\Session
+  App\Core\Database:
+    class: App\Core\Database

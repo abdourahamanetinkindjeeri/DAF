@@ -1,13 +1,14 @@
 <?php
 
 use App\Core\App;
-
-use function App\Config\dump_die;
+use App\Core\Router;
 
 require_once __DIR__ . '/../vendor/autoload.php';
-require_once '../app/config/bootstrap.php';
+require_once __DIR__ . '/../app/config/bootstrap.php';
 
+// Initialiser l'application avec SimpleContainer
+App::init();
 
-\App\Core\Router::resolve(
-  isset($routes) ? $routes : []
-);
+// Résoudre la route
+$router = App::resolve(Router::class);
+$router->resolve(isset($routes) ? $routes : []);

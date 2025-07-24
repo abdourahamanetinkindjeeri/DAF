@@ -1,0 +1,9 @@
+FROM postgres:15
+
+# Variables d'environnement essentielles
+ENV POSTGRES_DB=appdaf
+ENV POSTGRES_USER=appdaf
+ENV POSTGRES_PASSWORD=appdaf
+
+# Exposer le port PostgreSQL
+EXPOSE 5432 

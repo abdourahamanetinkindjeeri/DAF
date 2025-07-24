@@ -2,18 +2,18 @@
 
 namespace App\Service\implements;
 
-use App\Core\Singleton;
 use App\Repository\CitoyenRepository;
 use App\Entity\Citoyen;
 use App\Service\CitoyenService;
 
-class CitoyenServiceImpl extends Singleton implements CitoyenService
+class CitoyenServiceImpl implements CitoyenService
 {
   private CitoyenRepository $citoyenRepository;
 
-  public function __construct()
+  public function __construct(CitoyenRepository $citoyenRepository)
   {
-      $this->citoyenRepository = CitoyenRepository::getInstance();  }
+    $this->citoyenRepository = $citoyenRepository;
+  }
 
   /**
    * Retourne tous les citoyens

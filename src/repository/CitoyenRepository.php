@@ -6,31 +6,24 @@ use App\Core\Abstract\AbstractRepository;
 use App\Core\Database;
 use App\Entity\Citoyen;
 
-use function App\Config\dump_die;
-
 class CitoyenRepository extends AbstractRepository
 {
-
   protected string $table = 'utilisateur';
 
-  public function __construct()
+  public function __construct(Database $database)
   {
-    parent::__construct();
-//    $this->db = Database::getInstance()->getConnection();
+    parent::__construct($database);
   }
+
   public function selectAll(): array
   {
-
     $stmt = $this->db->prepare("SELECT * FROM {$this->table}");
     $stmt->execute();
 
     $resultat = [];
-
     while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
       $resultat[] = Citoyen::toObject($row);
     }
-
-
     return $resultat;
   }
 
@@ -44,7 +37,6 @@ class CitoyenRepository extends AbstractRepository
 
     return $data ? Citoyen::toObject($data) : null;
   }
-
 
   public function insert()
   {

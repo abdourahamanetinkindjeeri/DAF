@@ -4,57 +4,54 @@ namespace App\Core;
 
 use Symfony\Component\Yaml\Yaml;
 use function App\Config\dump_die;
-use App\Core\Container;
 
 class App
 {
-  private static array $dependencies = [];
-  private static bool $initialized = false;
+    private static array $dependencies = [];
+    private static bool $initialized = false;
 
-  public static function init(): void
-  {
-    if (self::$initialized) return;
+    public static function init(): void
+    {
+        if (self::$initialized) return;
 
-    $configPath = __DIR__ . '/../config/services.yaml';
+        $configPath = __DIR__ . '/../config/services.yaml';
 
-    if (!file_exists($configPath)) {
-      throw new \Exception("Fichier services.yml introuvable à $configPath");
+        if (!file_exists($configPath)) {
+            throw new \Exception("Fichier services.yml introuvable à $configPath");
+        }
+
+        $yaml = Yaml::parseFile($configPath);
+        self::$dependencies = [];
+
+        foreach ($yaml as $group => $services) {
+            foreach ($services as $key => $service) {
+                self::$dependencies[$group][$key] = fn() => self::resolve($service);
+            }
+        }
+
+        self::$initialized = true;
     }
 
-    $yaml = Yaml::parseFile($configPath);
-    self::$dependencies = [];
+    public static function getDependency(string $key): mixed
+    {
+        self::init();
 
-    foreach ($yaml as $group => $services) {
-      foreach ($services as $key => $service) {
-        self::$dependencies[$group][$key] = fn() => self::resolve($service);
-      }
+        foreach (self::$dependencies as $group) {
+            if (isset($group[$key])) {
+                return $group[$key]();
+            }
+        }
+
+        throw new \Exception("Dependency '{$key}' not found");
     }
 
-    self::$initialized = true;
-  }
+    public static function resolve(string $service): mixed
+    {
+        if (str_contains($service, '::')) {
+            [$class, $method] = explode('::', $service);
+            return call_user_func([$class, $method]);
+        }
 
-  public static function getDependency(string $key): mixed
-  {
-    self::init();
-
-    foreach (self::$dependencies as $group) {
-      if (isset($group[$key])) {
-        return $group[$key]();
-      }
+        return new $service();
     }
-
-    throw new \Exception("Dependency '{$key}' not found");
-  }
-
-  public static function resolve(string $service): mixed
-  {
-    if (str_contains($service, '::')) {
-      [$class, $method] = explode('::', $service);
-      return call_user_func([$class, $method]);
-    }
-
-    // Utilise le container pour résoudre les dépendances
-    $container = new Container();
-    return $container->resolve($service);
-  }
 }
