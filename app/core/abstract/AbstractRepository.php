@@ -2,23 +2,22 @@
 
 namespace App\Core\Abstract;
 
-use App\Core\App;
+use App\Core\Database;
 
 abstract class AbstractRepository
 {
   protected string $table;
   protected \PDO $db;
 
-  abstract public  function selectAll();
-  abstract public  function insert();
-  abstract public  function update();
-  abstract public  function delete();
-  abstract public  function selectById();
-  abstract public  function selectBy(array $filter);
+  abstract public function selectAll();
+  abstract public function insert();
+  abstract public function update();
+  abstract public function delete();
+  abstract public function selectById();
+  abstract public function selectBy(array $filter);
 
   public function countRow(string $colonne, mixed $value, $table): int
   {
-    // Correction : on utilise une égalité simple pour le téléphone
     $sql = "SELECT COUNT(*) FROM {$table} WHERE {$colonne} = :value";
     $stmt = $this->db->prepare($sql);
     $stmt->bindValue(':value', $value);
@@ -31,8 +30,8 @@ abstract class AbstractRepository
     return $this->db;
   }
 
-  public function __construct()
+  public function __construct(Database $database)
   {
-    $this->db = App::get('App\\Core\\Database')->getConnection();
+    $this->db = $database->getConnection();
   }
 }

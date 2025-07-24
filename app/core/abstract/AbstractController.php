@@ -2,18 +2,12 @@
 
 namespace App\Core\Abstract;
 
-use App\Core\App;
 use App\Core\Session;
 
 abstract class AbstractController
 {
-  protected Session $session;
+  protected ?Session $session = null;
   protected string $layout = 'base';
-
-  public function __construct()
-  {
-    $this->session = App::get('App\\Core\\Session');
-  }
 
   protected function renderJSON(array $data, int $code = 200): void
   {

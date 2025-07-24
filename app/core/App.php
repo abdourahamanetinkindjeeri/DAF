@@ -1,58 +1,126 @@
 <?php
 
+// namespace App\Core;
+
+// use Symfony\Component\Yaml\Yaml;
+// use function App\Config\dump_die;
+// use App\Core\Container;
+
+// class App
+// {
+//   private static array $dependencies = [];
+//   private static bool $initialized = false;
+
+//   public static function init(): void
+//   {
+//     if (self::$initialized) return;
+
+//     $configPath = __DIR__ . '/../config/services.yaml';
+
+//     if (!file_exists($configPath)) {
+//       throw new \Exception("Fichier services.yml introuvable à $configPath");
+//     }
+
+//     $yaml = Yaml::parseFile($configPath);
+//     self::$dependencies = [];
+
+//     foreach ($yaml as $group => $services) {
+//       foreach ($services as $key => $service) {
+//         self::$dependencies[$group][$key] = fn() => self::resolve($service);
+//       }
+//     }
+
+//     self::$initialized = true;
+//   }
+
+//   public static function getDependency(string $key): mixed
+//   {
+//     self::init();
+
+//     foreach (self::$dependencies as $group) {
+//       if (isset($group[$key])) {
+//         return $group[$key]();
+//       }
+//     }
+
+//     throw new \Exception("Dependency '{$key}' not found");
+//   }
+
+//   public static function resolve(string $service): mixed
+//   {
+//     if (str_contains($service, '::')) {
+//       [$class, $method] = explode('::', $service);
+//       return call_user_func([$class, $method]);
+//     }
+
+//     // Utilise le container pour résoudre les dépendances
+//     $container = new Container();
+//     return $container->resolve($service);
+//   }
+// }
+
+
 namespace App\Core;
 
 use Symfony\Component\Yaml\Yaml;
+use App\Core\SimpleContainer;
 
 class App
 {
-  private static array $definitions = [];
-  private static array $instances = [];
+  private static array $dependencies = [];
   private static bool $initialized = false;
+  private static SimpleContainer $container;
 
   public static function init(): void
   {
     if (self::$initialized) return;
-    $yamlFile = __DIR__ . '/../config/services.yml';
-    self::$definitions = Yaml::parseFile($yamlFile)['services'];
-    self::$initialized = true;
-  }
 
-  public static function get(string $id): mixed
-  {
-    self::init();
+    // Initialiser le container
+    self::$container = new SimpleContainer();
 
-    if (isset(self::$instances[$id])) {
-      return self::$instances[$id];
+    $configPath = __DIR__ . '/../config/services.yaml';
+
+    if (!file_exists($configPath)) {
+      throw new \Exception("Fichier services.yaml introuvable à $configPath");
     }
 
-    if (!isset(self::$definitions[$id])) {
-      throw new \Exception("Service $id non défini.");
-    }
+    $yaml = Yaml::parseFile($configPath);
+    self::$dependencies = [];
 
-    $definition = self::$definitions[$id];
-    $class = $definition['class'] ?? $id;
+    foreach ($yaml as $group => $services) {
+      foreach ($services as $abstract => $concrete) {
+        // Bind dans le container
+        self::$container->bind($abstract, $concrete);
 
-    $args = [];
-    if (!empty($definition['arguments'])) {
-      foreach ($definition['arguments'] as $arg) {
-        if (is_string($arg) && str_starts_with($arg, '@')) {
-          $argId = substr($arg, 1);
-          $args[] = self::get($argId);
-        } else {
-          $args[] = $arg;
-        }
+        // Enregistrement des dépendances pour App::getDependency()
+        self::$dependencies[$group][$abstract] = fn() => self::container()->get($abstract);
       }
     }
 
-    // Gestion des singletons via getInstance
-    if (method_exists($class, 'getInstance')) {
-      $instance = $class::getInstance(...$args);
-    } else {
-      $instance = new $class(...$args);
-    }
-    self::$instances[$id] = $instance;
+    self::$initialized = true;
+  }
 
-    return $instance;
+  public static function getDependency(string $key): mixed
+  {
+    self::init();
+
+    foreach (self::$dependencies as $group) {
+      if (isset($group[$key])) {
+        return $group[$key](); // appel du closure
+      }
+    }
+
+    throw new \Exception("Dépendance '{$key}' introuvable.");
+  }
+
+  public static function resolve(string $class): mixed
+  {
+    self::init();
+    return self::container()->get($class);
+  }
+
+  public static function container(): SimpleContainer
+  {
+    return self::$container;
   }
 }

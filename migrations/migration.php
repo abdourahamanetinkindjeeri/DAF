@@ -9,7 +9,7 @@ require_once 'app/config/env.php';
 use PDO;
 use App\Migration\SQLGenerator;
 
-
+use function App\Config\dump_die;
 
 function prompt(string $label, bool $hidden = false): string
 {
@@ -69,10 +69,7 @@ function askDatabaseCredentials(): array
     'DB_NAME' => $dbName,
     'DB_USER' => $user,
     'DB_PASSWORD' => $pass,
-    'TOKEN' => TOKEN,
-    'MESSAGING_SID' => MESSAGING_SID,
-    'PHONE' => PHONE,
-    'TWILIO_SID' => TWILIO_SID,
+
     'BASE_URL' => BASE_URL,
     'PUBLIC_KEY' => PUBLIC_KEY,
     'PRIVATE_KEY' => PRIVATE_KEY,
@@ -123,7 +120,6 @@ if ($driver === 'pgsql') {
   $defaultDbName = 'mysql';
   $dsnDefault = "mysql:host=$host;dbname=$defaultDbName;port=$port;charset=utf8mb4";
 }
-
 try {
   $pdo = new PDO($dsnDefault, $user, $pass);
   $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);

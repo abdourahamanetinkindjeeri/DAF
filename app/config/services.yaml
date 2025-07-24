@@ -1,0 +1,10 @@
+core:
+  App\Core\Database: App\Core\Database
+  App\Core\Session: App\Core\Session
+  App\Core\Router: App\Core\Router
+
+repositories:
+  App\Repository\CitoyenRepository: App\Repository\CitoyenRepository
+
+services:
+  App\Service\CitoyenService: App\Service\implements\CitoyenServiceImpl

@@ -7,7 +7,7 @@ use function App\Config\dump_die;
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once '../app/config/bootstrap.php';
 
-
+// die;
 \App\Core\Router::resolve(
   isset($routes) ? $routes : []
 );
